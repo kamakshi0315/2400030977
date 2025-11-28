@@ -1,0 +1,125 @@
+import React, { useState } from "react";
+
+// CoursesApp.jsx
+// Single-file React component (default export) that displays a list of courses.
+// Tailwind CSS classes are used for styling. If you don't have Tailwind set up,
+// either add it or replace the classes with your own CSS.
+
+export default function CoursesApp() {
+  const initialCourses = [
+    { id: 1, title: "Introduction to Electronics", level: "Beginner", duration: "6 weeks" },
+    { id: 2, title: "Circuit Theory", level: "Intermediate", duration: "8 weeks" },
+    { id: 3, title: "Digital Logic Design", level: "Intermediate", duration: "7 weeks" },
+    { id: 4, title: "Microcontrollers (8051/AVR/ARM)", level: "Advanced", duration: "10 weeks" },
+  ];
+
+  const [courses, setCourses] = useState(initialCourses);
+  const [query, setQuery] = useState("");
+  const [form, setForm] = useState({ title: "", level: "Beginner", duration: "4 weeks" });
+
+  function handleAdd(e) {
+    e.preventDefault();
+    if (!form.title.trim()) return;
+    const newCourse = {
+      id: Date.now(),
+      title: form.title.trim(),
+      level: form.level,
+      duration: form.duration,
+    };
+    setCourses((c) => [newCourse, ...c]);
+    setForm({ title: "", level: "Beginner", duration: "4 weeks" });
+  }
+
+  function handleRemove(id) {
+    setCourses((c) => c.filter((x) => x.id !== id));
+  }
+
+  const filtered = courses.filter((c) =>
+    c.title.toLowerCase().includes(query.toLowerCase()) ||
+    c.level.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-6 flex items-start justify-center">
+      <div className="max-w-3xl w-full">
+        <header className="mb-6">
+          <h1 className="text-3xl font-extrabold">Courses</h1>
+          <p className="text-sm text-slate-600">Browse, search and add courses.</p>
+        </header>
+
+        <section className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by title or level..."
+            className="w-full p-3 rounded-lg border border-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-300"
+          />
+
+          <form onSubmit={handleAdd} className="p-3 rounded-lg border border-slate-200 bg-white shadow-sm">
+            <h2 className="font-semibold mb-3">Add a new course</h2>
+            <input
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              placeholder="Course title"
+              className="w-full p-2 mb-2 rounded-md border border-slate-200"
+            />
+            <div className="flex gap-2 mb-2">
+              <select
+                value={form.level}
+                onChange={(e) => setForm({ ...form, level: e.target.value })}
+                className="flex-1 p-2 rounded-md border border-slate-200"
+              >
+                <option>Beginner</option>
+                <option>Intermediate</option>
+                <option>Advanced</option>
+              </select>
+              <input
+                value={form.duration}
+                onChange={(e) => setForm({ ...form, duration: e.target.value })}
+                className="w-36 p-2 rounded-md border border-slate-200"
+              />
+            </div>
+            <div className="flex justify-end">
+              <button className="px-4 py-2 rounded-md bg-sky-600 text-white hover:bg-sky-700">Add</button>
+            </div>
+          </form>
+        </section>
+
+        <main>
+          <p className="text-sm text-slate-500 mb-3">Showing <strong>{filtered.length}</strong> of {courses.length} courses</p>
+
+          <div className="grid gap-4">
+            {filtered.map((c) => (
+              <article key={c.id} className="p-4 rounded-lg bg-white border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">{c.title}</h3>
+                  <p className="text-sm text-slate-600">{c.level} • {c.duration}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => alert(`You clicked on ${c.title}`)}
+                    className="px-3 py-1 rounded-md border border-slate-200 text-sm"
+                  >
+                    View
+                  </button>
+                  <button
+                    onClick={() => handleRemove(c.id)}
+                    className="px-3 py-1 rounded-md border border-rose-400 text-rose-600 text-sm"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </article>
+            ))}
+
+            {filtered.length === 0 && (
+              <div className="p-6 text-center text-slate-500">No courses found. Try a different search or add a new course.</div>
+            )}
+          </div>
+        </main>
+
+        <footer className="mt-6 text-center text-xs text-slate-400">Simple React courses list — single-file component</footer>
+      </div>
+    </div>
+  );
+}
